@@ -1,0 +1,21 @@
+{
+  "name": "@arc-id/examples",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node index.ts"
+  },
+  "dependencies": {
+    "@arc-id/adapters": "workspace:*",
+    "@arc-id/core": "workspace:*",
+    "@arc-id/sdk": "workspace:*",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

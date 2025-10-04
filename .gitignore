@@ -1,0 +1,44 @@
+node_modules
+pnpm-lock.yaml
+# Node
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Builds
+dist/
+build/
+.next/
+out/
+coverage/
+
+# Env
+.env
+.env.local
+.env.docker
+.env.*.local
+
+# Logs
+*.log
+logs/
+*.pid
+*.seed
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Turbo
+.turbo/
+
+# Prisma
+prisma/migrations/
+
+# Docker
+*.pid
+*.seed
+docker-compose.override.yml

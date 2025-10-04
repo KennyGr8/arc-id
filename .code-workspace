@@ -1,0 +1,12 @@
+{
+  "folders": [
+    { "path": "." },
+    { "path": "packages/core" },
+    { "path": "packages/adapters" },
+    { "path": "packages/common" },
+    { "path": "packages/sdk" },
+    { "path": "packages/cli" },
+    { "path": "examples/basic-app" }
+  ],
+  "settings": {}
+}

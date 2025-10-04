@@ -1,0 +1,20 @@
+{
+  "name": "@arc-id/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "arc-id": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@arc-id/core": "workspace:*",
+    "commander": "^11.1.0",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

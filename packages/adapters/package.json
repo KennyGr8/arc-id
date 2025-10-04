@@ -1,0 +1,33 @@
+{
+  "name": "@arc-id/adapters",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@arc-id/core": "workspace:*",
+    "@getbrevo/brevo": "^3.0.1",
+    "@sendgrid/mail": "^8.1.6",
+    "ioredis": "^5.8.0",
+    "mongodb": "^6.2.0",
+    "mongoose": "^8.18.2",
+    "mysql2": "^3.6.2",
+    "nodemailer": "^7.0.6",
+    "paystack-sdk": "^3.0.0",
+    "pg": "^8.11.3",
+    "postmark": "^4.0.5",
+    "redis": "^4.6.7",
+    "resend": "^6.1.1",
+    "stripe": "^18.5.0"
+  },
+  "devDependencies": {
+    "@types/ioredis": "^5.0.0",
+    "@types/nodemailer": "^7.0.2",
+    "@types/postmark": "^2.0.3",
+    "typescript": "^5.3.3"
+  }
+}
