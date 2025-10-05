@@ -1,6 +1,6 @@
 // nodemailer/transactional.adapter.ts
 import nodemailer from "nodemailer";
-import { MailerAdapter } from "../types";
+import { MailerAdapter } from "../index";
 import { config } from "@arc-id/common";
 
 export class NodemailerTransactionalAdapter implements MailerAdapter {

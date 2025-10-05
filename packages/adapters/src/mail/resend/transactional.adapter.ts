@@ -1,6 +1,6 @@
 // resend/transactional.adapter.ts
 import { Resend } from "resend";
-import { MailerAdapter } from "../types";
+import { MailerAdapter } from "../index";
 import { config } from "@arc-id/common";
 
 export class ResendTransactionalAdapter implements MailerAdapter {

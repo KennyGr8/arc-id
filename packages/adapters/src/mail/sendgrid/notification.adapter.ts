@@ -1,5 +1,5 @@
 import sgMail, { MailDataRequired } from '@sendgrid/mail'
-import { MailerAdapter } from '../types'
+import { MailerAdapter } from '../index'
 import { config } from '@arc-id/common'
 
 export class SendGridNotificationAdapter implements MailerAdapter {

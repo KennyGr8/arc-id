@@ -12,6 +12,7 @@
     "@arc-id/core": "workspace:*",
     "@getbrevo/brevo": "^3.0.1",
     "@sendgrid/mail": "^8.1.6",
+    "axios": "^1.12.2",
     "ioredis": "^5.8.0",
     "mongodb": "^6.2.0",
     "mongoose": "^8.18.2",

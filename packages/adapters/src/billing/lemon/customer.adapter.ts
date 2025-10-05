@@ -1,12 +1,24 @@
 // packages/adapters/src/billing/lemon/customer.adapter.ts
-import { BillingAdapter } from '../types';
+import axios from 'axios';
+import { BillingAdapter } from '../index';
+import { config } from '@arc-id/common';
 
 export class LemonCustomerAdapter implements BillingAdapter {
-  async createCustomer(options: { email: string; name?: string; metadata?: Record<string, any>; }) {
-    throw new Error('LemonCustomerAdapter.createCustomer not implemented');
+  private baseUrl = 'https://api.lemonsqueezy.com/v1';
+
+  async createCustomer(options: { email: string; name?: string }) {
+    const response = await axios.post(
+      `${this.baseUrl}/customers`,
+      { email: options.email, name: options.name },
+      { headers: { Authorization: `Bearer ${config.BILLING.LEMON.API_KEY}` } }
+    );
+    return response.data;
   }
 
   async getCustomer(customerId: string) {
-    throw new Error('LemonCustomerAdapter.getCustomer not implemented');
+    const response = await axios.get(`${this.baseUrl}/customers/${customerId}`, {
+      headers: { Authorization: `Bearer ${config.BILLING.LEMON.API_KEY}` },
+    });
+    return response.data;
   }
 }

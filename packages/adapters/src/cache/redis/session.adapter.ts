@@ -1,5 +1,5 @@
 import Redis from 'ioredis'
-import { CacheAdapter } from '../types'
+import { CacheAdapter } from '../index'
 import { config } from '@arc-id/common'
 
 export class RedisSessionAdapter implements CacheAdapter {

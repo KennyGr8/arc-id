@@ -1,6 +1,6 @@
 // postmark/notification.adapter.ts
 import { ServerClient } from "postmark";
-import { MailerAdapter } from "../types";
+import { MailerAdapter } from "../index";
 import { config } from "@arc-id/common";
 
 export class PostmarkNotificationAdapter implements MailerAdapter {

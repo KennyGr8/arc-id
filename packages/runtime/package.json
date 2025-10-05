@@ -1,0 +1,30 @@
+{
+  "name": "@arc-id/runtime",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.mjs",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "@arc-id/core": "workspace:*",
+    "@arc-id/adapters": "workspace:*",
+    "@arc-id/common": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "ts-node": "^10.9.2",
+    "rimraf": "^5.0.1"
+  },
+  "keywords": [
+    "arc-id",
+    "runtime",
+    "bootstrap",
+    "dependency-injection"
+  ],
+  "license": "MIT"
+}

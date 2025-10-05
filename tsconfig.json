@@ -6,6 +6,8 @@
     { "path": "packages/adapters" },
     { "path": "packages/sdk" },
     { "path": "packages/cli" },
+    { "path": "packages/emails" },
+    { "path": "packages/runtime" },
     { "path": "examples/basic-app" }
   ]
 }
