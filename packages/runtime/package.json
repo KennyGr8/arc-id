@@ -6,19 +6,22 @@
   "module": "dist/index.mjs",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -b",
     "clean": "rimraf dist",
+    "start": "node dist/index.js",
     "dev": "ts-node src/index.ts"
   },
   "dependencies": {
-    "@arc-id/core": "workspace:*",
     "@arc-id/adapters": "workspace:*",
-    "@arc-id/common": "workspace:*"
+    "@arc-id/common": "workspace:*",
+    "@arc-id/core": "workspace:*",
+    "express": "^5.1.0",
+    "pino": "^10.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.4",
+    "rimraf": "^5.0.1",
     "ts-node": "^10.9.2",
-    "rimraf": "^5.0.1"
+    "typescript": "^5.5.4"
   },
   "keywords": [
     "arc-id",

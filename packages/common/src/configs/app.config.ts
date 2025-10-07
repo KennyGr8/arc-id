@@ -15,8 +15,9 @@ export const config = {
     DOMAIN: getEnv("DB_DOMAIN"),
     FALLBACK_ORDER: getEnv("DB_FALLBACK_ORDER").split(","),
   },
-
+  
   CACHE: {
+    DOMAIN: getEnv("CACHE_DOMAIN"),
     PROVIDER: getEnv("CACHE_PROVIDER"),
     URL: getEnv("REDIS_URL"),
   },

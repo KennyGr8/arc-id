@@ -1,4 +1,4 @@
-// types.ts
+// packages/adapters/src/mail/types.ts
 export interface MailerAdapter {
   sendEmail(options: {
     to: string | string[]

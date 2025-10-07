@@ -12,9 +12,10 @@ export const envSchema = z.object({
   DB_URL: z.string().url(),
   DB_DOMAIN: z.enum(["primary", "replica", "analytics"]).default("primary"),
   DB_FALLBACK_ORDER: z.string().default("postgres"),
-
+  
   // Cache
   CACHE_PROVIDER: z.enum(["redis"]),
+  CACHE_DOMAIN: z.enum(["session", "rate-limit", "jobs", "general"]).default("general"),
   REDIS_URL: z.string().url(),
 
   // JWT
@@ -50,7 +51,7 @@ export const envSchema = z.object({
 
   // Billing
   BILLING_PROVIDER: z.enum(["stripe", "paystack", "lemonsqueezy"]),
-  BILLING_DOMAIN: z.enum(["checkout", "subscription", "one-time", "webhook"]).default("checkout"),
+  BILLING_DOMAIN: z.enum(["checkout", "subscription", "invoices", "customer", "webhook"]).default("checkout"),
   BILLING_FALLBACK_ORDER: z.string().default("stripe,paystack,lemonsqueezy"),
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_PUBLIC_KEY: z.string().optional(),

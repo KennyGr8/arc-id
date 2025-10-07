@@ -7,19 +7,9 @@
   "scripts": {
     "build": "tsc -b",
     "dev": "tsc -w",
-    "test": "jest",
-    "migrate:postgres": "prisma migrate dev --schema=prisma/postgres/schema.prisma --name init-postgres",
-    "migrate:mysql": "prisma migrate dev --schema=prisma/mysql/schema.prisma --name init-mysql",
-    "migrate:cockroach": "prisma migrate dev --schema=prisma/cockroach/schema.prisma --name init-cockroach",
-    "migrate:sqlite": "prisma migrate dev --schema=prisma/sqlite/schema.prisma --name init-sqlite",
-    "generate:postgres": "prisma generate --schema=prisma/postgres/schema.prisma",
-    "generate:mysql": "prisma generate --schema=prisma/mysql/schema.prisma",
-    "generate:cockroach": "prisma generate --schema=prisma/cockroach/schema.prisma",
-    "generate:sqlite": "prisma generate --schema=prisma/sqlite/schema.prisma",
-    "generate:all": "pnpm generate:postgres && pnpm generate:mysql && pnpm generate:sqlite && pnpm generate:cockroach"
+    "test": "jest"
   },
   "dependencies": {
-    "@prisma/client": "^6.16.3",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.3",
     "jsonwebtoken": "^9.0.2",
@@ -29,7 +19,6 @@
   "devDependencies": {
     "@types/node": "^24.6.2",
     "jest": "^30.2.0",
-    "prisma": "^6.16.3",
     "ts-jest": "^29.4.4",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
