@@ -7,14 +7,14 @@
   "type": "module",
   "scripts": {
     "build": "tsc -b",
-    "clean": "rimraf dist",
+    "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo node_modules",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts"
   },
   "dependencies": {
     "@arc-id/adapters": "workspace:*",
     "@arc-id/common": "workspace:*",
-    "@arc-id/core": "workspace:*",
+    "events": "^3.3.0",
     "express": "^5.1.0",
     "pino": "^10.0.0"
   },

@@ -1,11 +1,9 @@
 // packages/runtime/src/bootstrap/app.ts
-import { initProviders } from './providers'
-import { registerProviders } from './container'
-import { loadModules } from './loader'
+import { loadModules, runtimeEvents, initProviders, registerProviders } from '../index'
 import { logger } from '@arc-id/common'
 
 export async function createRuntime(modules: string[]) {
-  logger.info('🧠 Bootstrapping Arc Runtime...')
+  logger.info('🧠 Bootstrapping ArcID Runtime...')
 
   // Step 1: Init Providers
   const providers = await initProviders()
@@ -15,4 +13,6 @@ export async function createRuntime(modules: string[]) {
   await loadModules(modules)
 
   logger.info('🚀 Arc Runtime ready.')
+
+  runtimeEvents.emit('runtime:ready', providers)
 }

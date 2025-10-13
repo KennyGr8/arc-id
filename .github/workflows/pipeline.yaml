@@ -1,0 +1,27 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Set uo Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 22.9.0
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Run test
+      run: pnpm test
+
+    - name: Run build
+      run: pnpm build

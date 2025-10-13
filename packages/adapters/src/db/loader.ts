@@ -43,18 +43,20 @@ async function dbFactory(
   mongooseInstance?: mongoose.Mongoose
 ): Promise<DBAdapter | null> {
   try {
-    let db: DBAdapter<any> | null = null
+    let db: DBAdapter | null = null
 
     switch (provider) {
       case 'postgres':
       case 'mysql':
       case 'sqlite':
       case 'cockroach': {
-        const client = prismaClient ?? getPrismaClient(provider)
+        const client = (prismaClient ?? (getPrismaClient(provider) as unknown)) as PrismaClients
         db = getDBAdapter(provider, client)
         if (client) {
           await connectAll()
-          if (config.APP.NODE_ENV !== 'production') initLogging()
+          if (config.APP.NODE_ENV !== 'production') {
+            initLogging()
+          }
         }
         break
       }
@@ -68,8 +70,7 @@ async function dbFactory(
       }
 
       case 'mongoose': {
-        const mongo =
-          mongooseInstance ?? (await mongoose.connect(config.DB.URL))
+        const mongo = mongooseInstance ?? (await mongoose.connect(config.DB.URL))
         db = getDBAdapter('mongoose', mongo)
         break
       }
@@ -82,10 +83,7 @@ async function dbFactory(
 
     return db
   } catch (err) {
-    console.error(
-      `[DB][${provider}][${domain}] Failed:`,
-      (err as Error).message
-    )
+    console.error(`[DB][${provider}][${domain}] Failed:`, (err as Error).message)
     return null
   }
 }
@@ -105,14 +103,7 @@ export async function loadDBProvider(
   let db: DBAdapter | null = null
 
   for (const p of providersToTry) {
-    db = await dbFactory(
-      p,
-      domain,
-      prismaClient,
-      mongoClient,
-      dbName,
-      mongooseInstance
-    )
+    db = await dbFactory(p, domain, prismaClient, mongoClient, dbName, mongooseInstance)
     if (db) break
   }
 
@@ -122,11 +113,13 @@ export async function loadDBProvider(
   return db
 }
 
-/**
- * Clear DB cache for one or all domains
- */
+/** Clear DB cache for one or all domains */
 export function clearDBCache(domain?: DBDomains) {
-  if (domain) cachedDb[domain] = null
-  else
-    Object.keys(cachedDb).forEach((key) => (cachedDb[key as DBDomains] = null))
+  if (domain) {
+    cachedDb[domain] = null
+  } else {
+    Object.keys(cachedDb).forEach((key) => {
+      cachedDb[key as DBDomains] = null
+    })
+  }
 }

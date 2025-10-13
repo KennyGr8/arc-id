@@ -1,4 +1,5 @@
-import { HTTPSTATUS, ErrorCode, HttpStatusCode } from '../index'
+import { HTTPSTATUS, HttpStatusCode } from '../configs'
+import { ErrorCode } from '../constants'
 
 export class AppError extends Error {
   public statusCode: HttpStatusCode

@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo node_modules",
     "build": "tsc -b",
     "dev": "tsc -w",
     "test": "jest",
@@ -20,6 +21,7 @@
     "generate:all": "pnpm generate:postgres && pnpm generate:mysql && pnpm generate:sqlite && pnpm generate:cockroach"
   },
   "dependencies": {
+    "@arc-id/common": "workspace:*",
     "@prisma/client": "^6.16.3"
   },
   "devDependencies": {

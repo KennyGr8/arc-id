@@ -1,4 +1,9 @@
+version: '3.8'
+
 services:
+  # ──────────────────────────────
+  # MySQL Database
+  # ──────────────────────────────
   mysql:
     image: mysql:8.0
     container_name: arc-id_mysql
@@ -19,8 +24,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 30
-      start_period: 300s   # MySQL needs longer init time
+      start_period: 300s # MySQL needs longer init time
 
+  # ──────────────────────────────
+  # PostgreSQL Database
+  # ──────────────────────────────
   postgres:
     image: postgres:15
     container_name: arc-id_postgres
@@ -38,15 +46,19 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 60s    # Postgres usually fast, but give 1 min buffer
+      start_period: 60s
 
+  # ──────────────────────────────
+  # CockroachDB (SQL-compatible)
+  # ──────────────────────────────
   cockroach:
     image: cockroachdb/cockroach:v23.2.4
     container_name: arc-id_cockroach
     command: start-single-node --insecure
+    restart: always
     ports:
-      - "26257:26257"
-      - "8080:8080"
+      - "26257:26257" # SQL port
+      - "8080:8080"   # Web UI
     volumes:
       - cockroach_data:/cockroach/cockroach-data
     healthcheck:
@@ -54,25 +66,54 @@ services:
       interval: 15s
       timeout: 10s
       retries: 20
-      start_period: 120s   # Cockroach needs extra buffer to stabilize
+      start_period: 120s
 
-#  mongo:
-#    image: mongo:7
-#    container_name: arc-id_mongo
-#    restart: always
-#    ports:
-#      - "27017:27017"
-#    volumes:
-#      - mongo_data:/data/db
-#    healthcheck:
-#      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 60s
+  # ──────────────────────────────
+  # MongoDB (for NoSQL adapter)
+  # ──────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: arc-id_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: arc_id
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
 
+  # ──────────────────────────────
+  # Redis (for caching, queues, sessions)
+  # ──────────────────────────────
+  redis:
+    image: redis:7
+    container_name: arc-id_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+# ──────────────────────────────
+# Persistent Volumes
+# ──────────────────────────────
 volumes:
   mysql_data:
   postgres_data:
   cockroach_data:
-#  mongo_data:
+  mongo_data:
+  redis_data:

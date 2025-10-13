@@ -1,0 +1,107 @@
+🚧 Adapters we’re missing (to be future-proof & framework-agnostic)
+1. HTTP / Transport Adapter
+
+Purpose: decouple core from the web framework.
+
+Adapters: express, fastify, nest, hapi, koa, maybe next-api later.
+
+Why: so modules/controllers can just declare handlers, and the transport adapter wires them (routing, middlewares, validation, error handling).
+
+Without this, we risk tying modules directly to Express.
+
+👉 This is the next logical adapter to build — because every module (identity, session, oauth) needs routing.
+
+2. Auth/Token Adapter
+
+Purpose: unify token signing, verification, rotation.
+
+Adapters: jwt, paseto, maybe opaque tokens.
+
+Why: different orgs want different strategies; some regulated environments require PASETO over JWT.
+
+Role: Provide sign(payload, options) and verify(token) interfaces.
+
+Core modules (session, MFA, identity) will depend on this.
+
+3. Storage / Blob Adapter
+
+Purpose: handle file uploads, profile pictures, documents, audit exports, etc.
+
+Adapters: s3, gcs, azure-blob, local-fs.
+
+Why: SaaS often needs user profile storage or consent export downloads.
+
+4. Queue / Jobs Adapter (optional but common)
+
+Purpose: handle async background jobs (email, billing events, analytics).
+
+Adapters: bullmq, rabbitmq, kafka, in-memory.
+
+Why: good for scaling — send email events, billing webhook processing, etc., off the main thread.
+
+5. Logger Adapter
+
+Purpose: unify logging.
+
+Adapters: pino, winston, bunyan, console fallback.
+
+Why: Some companies want structured logging shipped to ELK/Datadog.
+
+(We have a logger in @arc-id/common, but making it an adapter keeps it pluggable).
+
+6. Analytics/Telemetry Adapter (stretch goal, but important later)
+
+Purpose: send events to Mixpanel, Segment, Posthog, etc.
+
+Why: devs using ArcID will want to track user identity events.
+
+Adapter-based design allows opting-in or stubbing out analytics.
+
+⚡️ Summary
+
+✅ You already have db, mail, cache, billing.
+
+🚧 Missing but valuable:
+
+HTTP adapter (most urgent, needed for modules)
+
+Token adapter (needed for session + auth flows)
+
+Storage adapter (optional now, useful later)
+
+Queue adapter (for jobs)
+
+Logger adapter (pluggable logging)
+
+Analytics adapter (stretch goal)
+
+packages/
+ ├─ adapters/
+ │   ├─ db/
+ │   ├─ mail/
+ │   ├─ cache/
+ │   ├─ billing/
+ │   └─ http/
+ │       ├─ ts-js/
+ │       │   ├─ express.adapter.ts
+ │       │   ├─ fastify.adapter.ts
+ │       │   ├─ hono.adapter.ts
+ │       │   ├─ node.adapter.ts
+ │       │   └─ nest.adapter.ts
+ │       ├─ python/...
+ │       ├─ php/...
+ │       ├─ go/...
+ │       ├─ loader.ts
+ │       └─ types.ts
+ │
+ ├─ core/
+ │   ├─ modules/
+ │   │   ├─ auth/
+ │   │   ├─ session/
+ │   │   ├─ oauth/
+ │   └─ server.ts
+ │
+ ├─ cli/
+ ├─ sdk-node/
+ ├─ sdk-react/
+ └─ ui-kit/

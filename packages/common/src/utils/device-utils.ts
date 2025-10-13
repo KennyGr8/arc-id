@@ -1,4 +1,3 @@
-import { UAParser } from "ua-parser-js";
 import geoip from "geoip-lite";
 
 export function getGeoLocation(ip?: string) {

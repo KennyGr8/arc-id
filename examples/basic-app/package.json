@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "ts-node index.ts"
+    "dev": "ts-node index.ts",
+    "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@arc-id/adapters": "workspace:*",

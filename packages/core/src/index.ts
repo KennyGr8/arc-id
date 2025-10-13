@@ -1,19 +1,22 @@
-// packages/core/src/index.ts
-import { createRuntime } from '@arc-id/runtime'
-import { config, logger } from '@arc-id/common'
+// packages/core/src/test-runtime.ts
+import { initRuntime } from '@arc-id/runtime'
+import { logger } from '@arc-id/common'
 
 export async function startCore() {
-  logger.info('🧩 Starting ArcID Core...')
+  logger.info('🧩 Starting ArcID Core (Test Mode)...')
 
-  // Define module entry points
   const coreModules = [
-    './modules/auth/index.js',
-    './modules/session/index.js',
-    './modules/mfa/index.js',
+    './modules/test/index.js', // 👈 test first
   ]
 
-  // Initialize runtime and load core modules
-  await createRuntime(coreModules)
+  await initRuntime(coreModules)
 
-  logger.info('✅ ArcID Core initialized successfully')
+  logger.info('✅ ArcID Core test run complete')
+}
+
+if (require.main === module) {
+  startCore().catch(err => {
+    console.error('❌ Boot failed:', err)
+    process.exit(1)
+  })
 }

@@ -1,68 +1,94 @@
 import type {
-  IAuthorizationCodeAdapter,
-  CreateAuthorizationCodeDTO,
-  AuthorizationCode,
-} from '@arc-id/data';
-import type { Db, WithId, Document } from 'mongodb';
-import { generateId } from '@arc-id/common';
+  IClientAdapter,
+  CreateClientDTO,
+  UpdateClientDTO,
+  Client,
+} from '@arc-id/data'
+import type { Db, Collection } from 'mongodb'
+import { generateId } from '@arc-id/common'
 
-export class MongoAuthorizationCodeAdapter implements IAuthorizationCodeAdapter {
-  private collection;
+export class MongoClientAdapter implements IClientAdapter {
+  private collection: Collection<Client>
 
   constructor(private db: Db) {
-    this.collection = db.collection('authorizationCodes');
+    this.collection = db.collection<Client>('clients')
   }
 
   switchClient(newDb: Db) {
-    this.db = newDb;
-    this.collection = newDb.collection('authorizationCodes');
-    return this;
+    this.db = newDb
+    this.collection = newDb.collection<Client>('clients')
+    return this
   }
 
-  private normalize(doc: WithId<Document>): AuthorizationCode {
-    return {
-      id: (doc.id as string) ?? doc._id.toString() ?? generateId(),
-      code: doc.code,
-      clientId: doc.clientId,
-      identityId: doc.identityId,
-      redirectUri: doc.redirectUri ?? null,
-      scopes: Array.isArray(doc.scopes) ? doc.scopes : [doc.scopes ?? ''],
-      createdAt: doc.createdAt ?? new Date(),
-      expiresAt: doc.expiresAt,
-      consumed: doc.consumed ?? false,
-    };
-  }
-
-  async createCode(data: CreateAuthorizationCodeDTO): Promise<AuthorizationCode> {
-    const codeDoc: Omit<AuthorizationCode, 'id'> = {
-      code: data.code,
+  async createClient(data: CreateClientDTO): Promise<Client> {
+    const client: Client = {
+      id: generateId(),
+      tenantId: data.tenantId ?? null,
+      name: data.name ?? 'Unnamed Client',
       clientId: data.clientId,
-      identityId: data.identityId,
-      redirectUri: data.redirectUri ?? null,
-      scopes: Array.isArray(data.scopes) ? data.scopes : [data.scopes ?? ''],
+      clientSecret: data.clientSecret ?? null,
+      redirectUris: Array.isArray(data.redirectUris)
+        ? data.redirectUris
+        : data.redirectUris
+        ? [data.redirectUris]
+        : [],
+      grantTypes: Array.isArray(data.grantTypes)
+        ? data.grantTypes
+        : data.grantTypes
+        ? [data.grantTypes]
+        : [],
+      scopes: Array.isArray(data.scopes)
+        ? data.scopes
+        : data.scopes
+        ? [data.scopes]
+        : [],
+      public: data.public ?? false,
       createdAt: new Date(),
-      expiresAt: data.expiresAt,
-      consumed: false,
-    };
+    }
 
-    const result = await this.collection.insertOne(codeDoc);
-    return this.normalize({ ...codeDoc, _id: result.insertedId });
+    await this.collection.insertOne(client)
+    return client
   }
 
-  async consumeCode(code: string): Promise<AuthorizationCode | null> {
+  async updateClient(id: string, data: UpdateClientDTO): Promise<Client> {
+    const updateData: Partial<Client> = {
+      name: data.name,
+      clientSecret: data.clientSecret ?? null,
+      redirectUris: Array.isArray(data.redirectUris)
+        ? data.redirectUris
+        : data.redirectUris
+        ? [data.redirectUris]
+        : undefined,
+      grantTypes: Array.isArray(data.grantTypes)
+        ? data.grantTypes
+        : data.grantTypes
+        ? [data.grantTypes]
+        : undefined,
+      scopes: Array.isArray(data.scopes)
+        ? data.scopes
+        : data.scopes
+        ? [data.scopes]
+        : undefined,
+      public: data.public,
+    }
+
+    // Use returnDocument: 'after' and destructure result directly
     const updated = await this.collection.findOneAndUpdate(
-      { code },
-      { $set: { consumed: true } },
+      { id },
+      { $set: { ...updateData } },
       { returnDocument: 'after' }
-    );
+    )
 
-    if (!updated.value) return null;
-    return this.normalize(updated.value);
+    // `findOneAndUpdate` now returns `Client | null`
+    if (!updated) throw new Error(`Client with id '${id}' not found`)
+    return updated
   }
 
-  async findByCode(code: string): Promise<AuthorizationCode | null> {
-    const doc = await this.collection.findOne({ code });
-    if (!doc) return null;
-    return this.normalize(doc);
+  async findByClientId(clientId: string): Promise<Client | null> {
+    return this.collection.findOne({ clientId })
+  }
+
+  async deleteClient(id: string): Promise<void> {
+    await this.collection.deleteOne({ id })
   }
 }

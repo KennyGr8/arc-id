@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo node_modules"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

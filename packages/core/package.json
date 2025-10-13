@@ -1,26 +1,50 @@
 {
   "name": "@arc-id/core",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc -b",
-    "dev": "tsc -w",
-    "test": "jest"
+    "dev": "tsx src/test-runtime.ts",
+    "watch": "tsc -w",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo node_modules"
   },
   "dependencies": {
+    "@arc-id/common": "workspace:*",
+    "@arc-id/runtime": "workspace:*",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
     "zod": "^4.1.11"
   },
   "devDependencies": {
     "@types/node": "^24.6.2",
-    "jest": "^30.2.0",
-    "ts-jest": "^29.4.4",
-    "typescript": "^5.9.3",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.5.4",
     "vitest": "^3.2.4"
-  }
+  },
+  "keywords": [
+    "arc-id",
+    "core",
+    "identity",
+    "kernel",
+    "auth-engine",
+    "agnostic"
+  ],
+  "license": "MIT"
 }

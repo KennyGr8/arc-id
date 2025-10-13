@@ -1,35 +1,54 @@
-// adapters/src/db/prisma/refresh-token.adapter.ts
-import type { PrismaClients, IRefreshTokenAdapter, CreateRefreshTokenDTO, RefreshToken } from "@arc-id/data";
+import type {
+  IRefreshTokenAdapter,
+  CreateRefreshTokenDTO,
+  RefreshToken,
+} from '@arc-id/data'
+import type { Db, Collection } from 'mongodb'
+import { generateId } from '@arc-id/common'
 
-export class RefreshTokenAdapter<T extends PrismaClients> implements IRefreshTokenAdapter {
-  private prisma: T;
+export class MongoRefreshTokenAdapter implements IRefreshTokenAdapter {
+  private collection: Collection<RefreshToken>
 
-  constructor(prisma: T) {
-    this.prisma = prisma;
+  constructor(private db: Db) {
+    this.collection = db.collection<RefreshToken>('refreshTokens')
   }
 
-  switchClient(newClient: T) {
-    this.prisma = newClient;
+  switchClient(newDb: Db) {
+    this.db = newDb
+    this.collection = newDb.collection<RefreshToken>('refreshTokens')
+    return this
   }
 
   async createToken(data: CreateRefreshTokenDTO): Promise<RefreshToken> {
-    return (this.prisma as any).refreshToken.create({ data });
+    const token: RefreshToken = {
+      id: generateId(),
+      token: data.token,
+      identityId: data.identityId,
+      clientId: data.clientId,
+      issuedAt: new Date(),
+      expiresAt: data.expiresAt,
+      revoked: false,
+      rotation: 0,
+    }
+
+    await this.collection.insertOne(token)
+    return token
   }
 
   async revokeToken(token: string): Promise<void> {
-    await (this.prisma as any).refreshToken.update({ where: { token }, data: { revoked: true } });
+    await this.collection.updateOne({ token }, { $set: { revoked: true } })
   }
 
   async rotateToken(token: string): Promise<RefreshToken | null> {
-    const existing = await this.findByToken(token);
-    if (!existing) return null;
-    return (this.prisma as any).refreshToken.update({
-      where: { token },
-      data: { rotation: existing.rotation + 1 },
-    });
+    const updated = await this.collection.findOneAndUpdate(
+      { token },
+      { $inc: { rotation: 1 } },
+      { returnDocument: 'after' }
+    )
+    return updated ?? null
   }
 
   async findByToken(token: string): Promise<RefreshToken | null> {
-    return (this.prisma as any).refreshToken.findUnique({ where: { token } });
+    return this.collection.findOne({ token })
   }
 }

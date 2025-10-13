@@ -6,7 +6,7 @@ import { MongoDBAdapter } from './mongo';
 import { MongooseDBAdapter } from './mongoose';
 
 import type { PrismaClients } from '@arc-id/data';
-import type { DBAdapter as BaseDBAdapter } from './index';
+import type { DBAdapter as BaseDBAdapter } from './base';
 
 export type DBProviders = 'postgres' | 'mysql' | 'sqlite' | 'cockroach' | 'memory' | 'mongo' | 'mongoose';
 

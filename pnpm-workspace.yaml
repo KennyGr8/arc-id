@@ -4,4 +4,10 @@ packages:
   - examples/*
 
 onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - esbuild
+  - prisma
+  - sharp
   - unrs-resolver

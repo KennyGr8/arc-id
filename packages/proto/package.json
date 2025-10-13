@@ -1,0 +1,26 @@
+{
+  "name": "@arc-id/proto",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Protocol buffer definitions for ArcID runtime and adapters",
+  "scripts": {
+    "gen:ts": "cross-env protoc --plugin=protoc-gen-ts=\"%CD%/node_modules/.bin/protoc-gen-ts.cmd\" --ts_out=../adapters/src/http/grpc/generated/ts --proto_path=../adapters/src/http/grpc/proto ../adapters/src/http/grpc/proto/http_adapter.proto",
+    
+    "gen:python": "cross-env \"%CD%/../../.venv/Scripts/python.exe\" -m grpc_tools.protoc -I=../adapters/src/http/grpc/proto --python_out=../adapters/src/http/grpc/generated/python --grpc_python_out=../adapters/src/http/grpc/generated/python ../adapters/src/http/grpc/proto/http_adapter.proto",
+    
+    "gen:php": "cross-env protoc --php_out=../adapters/src/http/grpc/generated/php --grpc_out=../adapters/src/http/grpc/generated/php --plugin=protoc-gen-grpc=\"/home/arcevodev/bin/grpc_php_plugin\" -I=../adapters/src/http/grpc/proto ../adapters/src/http/grpc/proto/http_adapter.proto",
+    
+    "gen:go": "cross-env protoc --go_out=../adapters/src/http/grpc/generated/go --go-grpc_out=../adapters/src/http/grpc/generated/go -I=../adapters/src/http/grpc/proto ../adapters/src/http/grpc/proto/http_adapter.proto",
+    
+    "gen:all": "pnpm gen:ts && pnpm gen:python && pnpm gen:php && pnpm gen:go"
+  },
+  "devDependencies": {
+    "@grpc/grpc-js": "^1.10.0",
+    "protobufjs": "^7.2.4",
+    "ts-proto": "^1.180.0",
+    "grpc-tools": "^1.12.4",
+    "protoc-gen-ts": "^0.8.7",
+    "cross-env": "^7.0.3"
+  }
+}
