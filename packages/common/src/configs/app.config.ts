@@ -9,14 +9,21 @@ export const config = {
     FRAMEWORK: getEnv("FRAMEWORK_PROVIDER"),
   },
 
+  HTTP: {
+    PROVIDER: getEnv("HTTP_PROVIDER"),
+    DOMAIN: getEnv("HTTP_DOMAIN"),
+    FALLBACK_ORDER: getEnv("HTTP_FALLBACK_ORDER").split(","),
+  },
+
   DB: {
     PROVIDER: getEnv("DB_PROVIDER"),
     URL: getEnv("DB_URL"),
     DOMAIN: getEnv("DB_DOMAIN"),
     FALLBACK_ORDER: getEnv("DB_FALLBACK_ORDER").split(","),
   },
-
+  
   CACHE: {
+    DOMAIN: getEnv("CACHE_DOMAIN"),
     PROVIDER: getEnv("CACHE_PROVIDER"),
     URL: getEnv("REDIS_URL"),
   },

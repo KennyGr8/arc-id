@@ -10,7 +10,6 @@
   },
   "references": [
     { "path": "../common" },
-    { "path": "../core" },
     { "path": "../adapters" }
   ],
   "include": ["src/**/*"],

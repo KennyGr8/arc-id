@@ -1,5 +1,6 @@
-import { HTTPSTATUS, HttpStatusCode, ErrorCode, AppError } from '../index'
-
+import {  ErrorCode } from '../constants';
+import { AppError } from './app-error';
+import { HTTPSTATUS, HttpStatusCode } from '../configs'
 export class NotFoundException extends AppError {
   constructor(message = "Resource not found", errorCode?: ErrorCode) {
     super(message, HTTPSTATUS.NOT_FOUND, errorCode || ErrorCode.RESOURCE_NOT_FOUND);

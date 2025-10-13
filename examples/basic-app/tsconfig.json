@@ -4,6 +4,6 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src"],
+  "include": ["src", "../../packages/runtime/src/http"],
   "exclude": ["node_modules", "dist"]
 }

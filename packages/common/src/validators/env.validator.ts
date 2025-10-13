@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { config } from '@arc-id/common'
 
 export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -7,14 +6,21 @@ export const envSchema = z.object({
   APP_ORIGIN: z.string().url(),
   PORT: z.coerce.number().default(4000),
 
+  // Http
+  HTTP_PROVIDER: z.enum(["express", "fastify", "koa", "hapi", "next", "node", "nest", "hono"]).default("express"),
+  HTTP_DOMAIN: z.enum(["default", "api", "admin", "public", "internal"]).default("default"),
+  HTTP_FALLBACK_ORDER: z.string().default("express,fastify,koa,hapi,node,next,nest,hono,fastapi,flask,django,sanic,symfony,laravel,slim,codeigniter,spring,expressive,gin,echo,fiber"),
+
   // Database
   DB_PROVIDER: z.enum(["postgres", "mysql", "sqlite", "cockroach", "memory"]).default("memory"),
   DB_URL: z.string().url(),
   DB_DOMAIN: z.enum(["primary", "replica", "analytics"]).default("primary"),
-  DB_FALLBACK_ORDER: z.string().default("postgres"),
-
+  DB_FALLBACK_ORDER: z.string().default("postgres,mysql,sqlite,cockroach,mongodb,dynamodb,memory,mongoose"),
+  
   // Cache
   CACHE_PROVIDER: z.enum(["redis"]),
+  CACHE_DOMAIN: z.enum( [ "session", "rate-limit", "jobs", "general" ] ).default( "general" ),
+  CACHE_FALLBACK_ORDER: z.string().default("redis,memory"),
   REDIS_URL: z.string().url(),
 
   // JWT
@@ -29,7 +35,7 @@ export const envSchema = z.object({
   // Mail
   MAIL_PROVIDER: z.enum(["nodemailer", "brevo", "resend", "postmark", "sendgrid", "console"]).default("console"),
   MAIL_DOMAIN: z.enum(["transactional", "bulk", "notification"]).default("transactional"),
-  MAIL_FALLBACK_ORDER: z.string().default("brevo,resend,nodemailer"),
+  MAIL_FALLBACK_ORDER: z.string().default("brevo,resend,nodemailer,postmark,sendgrid,console"),
   MAIL_SMTP_FROM: z.string().email().optional(),
   MAIL_SMTP_HOST: z.string().optional(),
   MAIL_SMTP_PORT: z.coerce.number().optional(),
@@ -50,7 +56,7 @@ export const envSchema = z.object({
 
   // Billing
   BILLING_PROVIDER: z.enum(["stripe", "paystack", "lemonsqueezy"]),
-  BILLING_DOMAIN: z.enum(["checkout", "subscription", "one-time", "webhook"]).default("checkout"),
+  BILLING_DOMAIN: z.enum(["checkout", "subscription", "invoices", "customer", "webhook"]).default("checkout"),
   BILLING_FALLBACK_ORDER: z.string().default("stripe,paystack,lemonsqueezy"),
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_PUBLIC_KEY: z.string().optional(),
@@ -70,4 +76,4 @@ export const envSchema = z.object({
   FRAMEWORK_PROVIDER: z.enum(["express"]),
 })
 
-export const env = envSchema.parse(config.APP.NODE_ENV)
+export const env = envSchema.parse(process.env)

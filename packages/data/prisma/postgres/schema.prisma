@@ -1,0 +1,505 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "node-api"
+  output     = "../../generated/postgres"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DB_URL")
+  shadowDatabaseUrl = env("SHADOW_DB_URL")
+}
+
+// -------------------- ENUMS --------------------
+enum MfaType {
+  TOTP
+  WEBAUTHN
+  EMAIL
+  SMS
+}
+
+enum Role {
+  ADMIN
+  USER
+  GUEST
+  MEMBER
+  CUSTOM // for dynamic/sector-specific roles
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  VERIFIED
+  SUSPENDED
+  BANNED
+  DELETED
+  PENDING
+  CUSTOM // for dynamic/sector-specific status
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+  ENTERPRISE
+  STUDENT
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELED
+  EXPIRED
+}
+
+enum TokenType {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+  MAGIC_LINK
+}
+
+// -------------------- CORE / IDENTITY --------------------
+// "Identity" is the canonical qID (one stable identity across tenants / services)
+model Identity {
+  id              String         @id @default(cuid())
+  primaryEmail    String?        @unique
+  emailVerified   Boolean        @default(false)
+  name            String?
+  role            Role           @default(USER) // global role (can be overridden by Membership)
+  status          UserStatus     @default(PENDING)
+  dynamicRoleId   String?
+  dynamicRole     DynamicRole?   @relation("IdentityDynamicRole", fields: [dynamicRoleId], references: [id])
+  dynamicStatusId String?
+  dynamicStatus   DynamicStatus? @relation("IdentityDynamicStatus", fields: [dynamicStatusId], references: [id])
+  metadata        Json?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // relations
+  memberships           Membership[]
+  externalIdentifiers   ExternalIdentifier[]
+  verifiableCredentials VerifiableCredential[]
+  oauthAccounts         OAuthAccount[]
+  sessions              Session[]
+  devices               Device[]
+  mfas                  Mfa[]
+  subscriptions         Subscription[]
+  wallets               Wallet[]
+  emailTokens           EmailToken[]
+  auditLogs             AuditLog[]
+  authorizationCodes    AuthorizationCode[]
+  LocalAccount          LocalAccount?
+  AccessToken           AccessToken[]
+  RefreshToken          RefreshToken[]
+  Consent               Consent[]
+
+  // Delegations (explicit separate relations for grantor/grantee)
+  delegationsGranted  AccessDelegation[] @relation("DelegationGrantor")
+  delegationsReceived AccessDelegation[] @relation("DelegationGrantee")
+
+  @@index([primaryEmail])
+}
+
+// -------------------- MULTI-TENANCY --------------------
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  sector    String?
+  createdAt DateTime @default(now())
+
+  clients          Client[]
+  memberships      Membership[]
+  projects         Project[]
+  policies         TenantPolicy[]
+  AccessDelegation AccessDelegation[]
+
+  @@index([sector])
+}
+
+model Membership {
+  id         String     @id @default(cuid())
+  identityId String
+  tenantId   String
+  role       Role       @default(USER)
+  status     UserStatus @default(ACTIVE)
+  profile    Json? // tenant/sector-specific profile data
+  createdAt  DateTime   @default(now())
+
+  identity Identity @relation(fields: [identityId], references: [id])
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([identityId, tenantId])
+  @@index([tenantId])
+  @@index([identityId])
+}
+
+// Optional project-level grouping for tenants
+model Project {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+}
+
+// Tenant level security & policy configuration
+model TenantPolicy {
+  id            String   @id @default(cuid())
+  tenantId      String
+  requireMfa    Boolean  @default(false)
+  passwordRules Json? // e.g. { "minLength": 10, "special": true }
+  loginMethods  String[] // e.g. ["email", "oauth", "magic"]
+  createdAt     DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+}
+
+// -------------------- ACCESS DELEGATION --------------------
+model AccessDelegation {
+  id        String    @id @default(cuid())
+  grantorId String
+  granteeId String
+  tenantId  String?
+  scopes    String[]
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+
+  grantor Identity @relation("DelegationGrantor", fields: [grantorId], references: [id])
+  grantee Identity @relation("DelegationGrantee", fields: [granteeId], references: [id])
+  tenant  Tenant?  @relation(fields: [tenantId], references: [id])
+
+  @@index([grantorId])
+  @@index([granteeId])
+  @@index([tenantId])
+}
+
+// -------------------- LOCAL ACCOUNT (email/password) --------------------
+// Keep local credentials separate from Identity to allow multiple auth methods and gradual migration.
+model LocalAccount {
+  id                String    @id @default(cuid())
+  identityId        String?   @unique
+  email             String    @unique
+  passwordHash      String
+  passwordAlgorithm String?
+  passwordUpdatedAt DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // relations
+  identity Identity? @relation(fields: [identityId], references: [id])
+  devices  Device[] // opposite relation for Device.localAccount
+  sessions Session[] // normalized relation name
+
+  @@index([email])
+}
+
+// -------------------- SESSIONS & DEVICES --------------------
+model Session {
+  id             String   @id @default(cuid())
+  identityId     String
+  localAccountId String?
+  ip             String?
+  userAgent      String?
+  deviceId       String?
+  device         Device?  @relation(fields: [deviceId], references: [id])
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime
+  valid          Boolean  @default(true)
+  lastUsedAt     DateTime @default(now())
+
+  identity     Identity      @relation(fields: [identityId], references: [id])
+  localAccount LocalAccount? @relation(fields: [localAccountId], references: [id])
+
+  @@index([identityId])
+  @@index([expiresAt])
+}
+
+model Device {
+  id             String   @id @default(cuid())
+  identityId     String
+  localAccountId String?
+  name           String?
+  fingerprint    String   @unique
+  platform       String?
+  browser        String?
+  city           String?
+  country        String?
+  createdAt      DateTime @default(now())
+  lastSeenAt     DateTime @default(now())
+
+  sessions     Session[]
+  identity     Identity      @relation(fields: [identityId], references: [id])
+  localAccount LocalAccount? @relation(fields: [localAccountId], references: [id])
+
+  @@index([identityId])
+}
+
+// -------------------- MFA --------------------
+model Mfa {
+  id         String   @id @default(cuid())
+  identityId String
+  type       MfaType
+  secret     String?
+  enabled    Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@index([identityId])
+}
+
+// -------------------- SUBSCRIPTIONS --------------------
+model Subscription {
+  id         String             @id @default(cuid())
+  identityId String
+  plan       SubscriptionPlan   @default(FREE)
+  status     SubscriptionStatus @default(ACTIVE)
+  startedAt  DateTime           @default(now())
+  endsAt     DateTime?
+  canceledAt DateTime?
+
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@index([identityId])
+  @@index([status])
+}
+
+// -------------------- OAUTH / PROVIDER LINKS --------------------
+model OAuthAccount {
+  id               String   @id @default(cuid())
+  identityId       String
+  provider         String
+  providerUserId   String
+  accessToken      String?
+  refreshToken     String?
+  providerMetadata Json?
+  linkedAt         DateTime @default(now())
+  verified         Boolean  @default(false)
+
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@unique([provider, providerUserId])
+  @@index([identityId])
+}
+
+// -------------------- EMAIL / MAGIC TOKEN --------------------
+model EmailToken {
+  id         String    @id @default(cuid())
+  identityId String
+  type       TokenType
+  token      String    @unique
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+  consumed   Boolean   @default(false)
+
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@index([identityId])
+  @@index([type])
+  @@index([expiresAt])
+}
+
+// -------------------- DYNAMIC / EXTENSIBLE --------------------
+model DynamicRole {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  sector    String?
+  createdAt DateTime @default(now())
+
+  identities Identity[] @relation("IdentityDynamicRole")
+}
+
+model DynamicStatus {
+  id        String   @id @default(cuid())
+  name      String
+  sector    String?
+  createdAt DateTime @default(now())
+
+  identities Identity[] @relation("IdentityDynamicStatus")
+}
+
+// -------------------- EXTERNAL IDENTIFIERS (BVN / NIN / TAX / PASSPORT) --------------------
+// IMPORTANT: For privacy, store only hashed/pseudonymized identifiers and encrypted metadata where necessary.
+model ExternalIdentifier {
+  id                 String    @id @default(cuid())
+  identityId         String
+  type               String // e.g. "BVN", "NIN", "TAX_ID", "PASSPORT"
+  valueHash          String // store hashed/pseudonymized value
+  displayValue       String? // optionally masked for UI (e.g. "XXX-1234")
+  verified           Boolean   @default(false)
+  verifiedAt         DateTime?
+  verificationMethod String? // e.g. "gov_api", "manual", "verifiable_credential"
+  verificationSource String?
+  metadata           Json?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@unique([type, valueHash])
+  @@index([identityId])
+}
+
+// -------------------- VERIFIABLE CREDENTIALS --------------------
+model VerifiableCredential {
+  id             String    @id @default(cuid())
+  identityId     String
+  issuer         String
+  credential     Json
+  credentialHash String    @unique
+  proof          Json?
+  issuedAt       DateTime
+  expiresAt      DateTime?
+  status         String?
+  createdAt      DateTime  @default(now())
+
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@index([identityId])
+}
+
+// -------------------- WALLET (placeholder for ArcWallet integration) --------------------
+model Wallet {
+  id               String   @id @default(cuid())
+  identityId       String
+  provider         String // e.g. "arcwallet", "stripe", "custodial_x"
+  providerWalletId String
+  metadata         Json?
+  createdAt        DateTime @default(now())
+
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@unique([provider, providerWalletId])
+  @@index([identityId])
+}
+
+// -------------------- OAUTH2 / OIDC ARTIFACTS --------------------
+model Client {
+  id           String   @id @default(cuid())
+  tenantId     String?
+  name         String
+  clientId     String   @unique
+  clientSecret String?
+  redirectUris String[]
+  grantTypes   String[]
+  scopes       String[]
+  public       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  tenant            Tenant?             @relation(fields: [tenantId], references: [id])
+  AuthorizationCode AuthorizationCode[]
+  AccessToken       AccessToken[]
+  RefreshToken      RefreshToken[]
+  Consent           Consent[]
+
+  @@index([tenantId])
+}
+
+model AuthorizationCode {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  clientId    String
+  identityId  String
+  redirectUri String?
+  scopes      String[]
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+  consumed    Boolean  @default(false)
+
+  client   Client   @relation(fields: [clientId], references: [id])
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@index([clientId])
+  @@index([expiresAt])
+}
+
+model AccessToken {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  clientId   String
+  identityId String
+  scopes     String[]
+  issuedAt   DateTime @default(now())
+  expiresAt  DateTime
+  revoked    Boolean  @default(false)
+  jti        String?  @unique
+
+  client   Client   @relation(fields: [clientId], references: [id])
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@index([identityId])
+  @@index([expiresAt])
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  clientId   String
+  identityId String
+  issuedAt   DateTime @default(now())
+  expiresAt  DateTime
+  revoked    Boolean  @default(false)
+  rotation   Int      @default(0)
+
+  client   Client   @relation(fields: [clientId], references: [id])
+  identity Identity @relation(fields: [identityId], references: [id])
+
+  @@index([identityId])
+  @@index([expiresAt])
+}
+
+model Consent {
+  id         String    @id @default(cuid())
+  identityId String
+  clientId   String
+  scopes     String[]
+  grantedAt  DateTime  @default(now())
+  revokedAt  DateTime?
+
+  identity Identity @relation(fields: [identityId], references: [id])
+  client   Client   @relation(fields: [clientId], references: [id])
+
+  @@index([identityId])
+  @@index([clientId])
+}
+
+// -------------------- AUDIT & REVOCATION --------------------
+model AuditLog {
+  id         String   @id @default(cuid())
+  identityId String?
+  actorId    String?
+  action     String
+  resource   String?
+  ip         String?
+  userAgent  String?
+  data       Json?
+  createdAt  DateTime @default(now())
+
+  identity Identity? @relation(fields: [identityId], references: [id])
+
+  @@index([identityId])
+  @@index([createdAt])
+}
+
+model RevokedJti {
+  id        String   @id @default(cuid())
+  jti       String   @unique
+  revokedAt DateTime @default(now())
+  reason    String?
+}
+
+// -------------------- NOTES --------------------
+// - Sensitive values (TOTP secrets, provider tokens, national ID values) should be encrypted at rest
+//   (use KMS + Prisma middleware or DB-level encryption). For external IDs prefer storing only salted hashes
+//   and masked display values to minimise exposure of PII.
+// - Use functional/partial indexes or Postgres citext extension for case-insensitive unique email checks.
+// - This schema is designed to be "Identity-first" (qID central). Existing code that expects a `User` model
+//   can be migrated by creating `Identity` rows for each pre-existing user and mapping `LocalAccount.identityId`.
+// - Policy: implement refresh-token rotation, JTI revocation, and audit logging for security/compliance.

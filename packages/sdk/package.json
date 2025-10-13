@@ -6,9 +6,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -b",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo node_modules"
   },
   "dependencies": {
+    "@arc-id/common": "workspace:*",
     "@arc-id/core": "workspace:*",
     "axios": "^1.6.7"
   },

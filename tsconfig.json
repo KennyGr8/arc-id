@@ -2,12 +2,13 @@
   "files": [],
   "references": [
     { "path": "packages/common" },
-    { "path": "packages/core" },
+    { "path": "packages/data" },
     { "path": "packages/adapters" },
+    { "path": "packages/runtime" },
+    { "path": "packages/core" },
     { "path": "packages/sdk" },
     { "path": "packages/cli" },
     { "path": "packages/emails" },
-    { "path": "packages/runtime" },
     { "path": "examples/basic-app" }
   ]
 }

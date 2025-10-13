@@ -1,36 +1,39 @@
 // packages/adapters/src/billing/types.ts
 export interface BillingAdapter {
+  // checkout / payment
   createPayment?(options: {
-    amount: number;
-    currency: string;
-    customerEmail?: string;
-    metadata?: Record<string, any>;
-  }): Promise<any>;
+    amount: number
+    currency: string
+    customerEmail?: string
+    metadata?: Record<string, any>
+  }): Promise<any>
 
+  // subscription
   createSubscription?(options: {
-    customerId: string;
-    planId: string;
-    trialPeriodDays?: number;
-    metadata?: Record<string, any>;
-  }): Promise<any>;
+    customerId: string
+    planId: string
+    trialPeriodDays?: number
+    metadata?: Record<string, any>
+  }): Promise<any>
 
-  cancelSubscription?(subscriptionId: string): Promise<any>;
+  cancelSubscription?(subscriptionId: string): Promise<any>
 
+  // invoices
   createInvoice?(options: {
-    customerId: string;
-    items: Array<{ description: string; amount: number; quantity?: number }>;
-    metadata?: Record<string, any>;
-  }): Promise<any>;
+    customerId: string
+    items: Array<{ description: string; amount: number; quantity?: number }>
+    metadata?: Record<string, any>
+  }): Promise<any>
+  getInvoice?(invoiceId: string): Promise<any>
 
-  getInvoice?(invoiceId: string): Promise<any>;
-
+  // customers
   createCustomer?(options: {
-    email: string;
-    name?: string;
-    metadata?: Record<string, any>;
-  }): Promise<any>;
+    email: string
+    name?: string
+    metadata?: Record<string, any>
+  }): Promise<any>
+  getCustomer?(customerId: string): Promise<any>
 
-  getCustomer?(customerId: string): Promise<any>;
-
-  handleWebhook?(payload: any, signature: string): Promise<any>;
+  // webhook
+  handleWebhook?(payload: any, signature?: string): Promise<any>
 }

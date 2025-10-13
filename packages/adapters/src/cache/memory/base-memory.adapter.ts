@@ -1,5 +1,5 @@
 // packages/adapters/src/cache/memory/base-memory.adapter.ts
-import { CacheAdapter } from '../index'
+import { CacheAdapter } from '../types'
 
 type CacheEntry<T> = {
   value: T

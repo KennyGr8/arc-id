@@ -5,3 +5,4 @@ export * as memory from './memory';
 
 export * from './loader'
 export * from './types'
+export * from './base'

@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@arc-id/*": ["packages/*/src"],
-      "@generated/*": ["packages/core/generated/*"]
+      "@generated/*": ["packages/data/generated/*"]
     }
   },
   "include": ["packages/**/*/src"]

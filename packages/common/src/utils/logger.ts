@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from 'winston'
 import 'winston-daily-rotate-file'
-import { config } from '../index'
+import { config } from '../configs'
 
 const logFormat = format.combine(
   format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -12,6 +12,10 @@ const logFormat = format.combine(
 
 export const logger = createLogger({
   level: config.APP.NODE_ENV === 'production' ? 'info' : 'debug',
+  // OR:
+  // get level() {
+  //   return config.APP.NODE_ENV === 'production' ? 'info' : 'debug';
+  // },
   format: logFormat,
   transports: [
     new transports.Console(),
