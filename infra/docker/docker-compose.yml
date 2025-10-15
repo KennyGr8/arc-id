@@ -1,3 +1,79 @@
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\arc-id> wsPORTS   Deskcts\ArcevoStack\a
+l -l -v
+rojects\ArcevoStack\arc-id> wsl -l -v
+  NAME              STATE           VERSION    
+* Ubuntu-24.04      Running         2
+  docker-desktop    Installing      2
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\a
+rc-id> wsl -l -v
+  NAME              STATE           VERSION    
+* Ubuntu-24.04      Running         2
+  docker-desktop    Running         2
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\arc-id> wsl -l -v r ps
+  NAME              STATE           VE             C
+RSION
+* Ubuntu-24.04      Running         2 
+  docker-desktop    Installing      2 
+PS C:\Users\USER\Desktop\Projects\Arce23.2.4   
+voStack\arc-id> wsl -l -v
+  NAME              STATE           VE: starting)   
+RSION
+* Ubuntu-24.04      Running         2 ockroach 
+rojects\ArcevoStack\arc-id> w
+sl -l -v
+  NAME              STATE    
+       VERSION
+* Ubuntu-24.04      Running  
+       2
+  docker-desktop    Installin
+g      2
+PS C:\Users\USER\Desktop\Proj
+ects\ArcevoStack\arc-id> wsl 
+-l -v
+  NAME              STATE    
+       VERSION
+* Ubuntu-24.04      Running  
+       2
+  docker-desktop    Running  
+       2
+PS C:\Users\USER\Desktop\Proj
+ects\ArcevoStack\arc-id> dock
+er ps
+CONTAINER ID   IMAGE
+                  COMMAND    
+              CREATED      ST
+ATUS                             PORTS
+       NAMES
+094f359dfaac   cockroachdb/cockroach:v23.2.4   "/cockroach/cockroac…s ago   Up 26 seconds (health: starting)   0.0.0.0:8080->8080/tcp, 0257->26257/tcp   arc-id_cockroach
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\arc-id> docker compose
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\arc-id> docker ps
+CONTAINER ID   IMAGE                           COMMAND              ED          STATUS                   PORTS
+           NAMES
+fa1a5b07ea45   mysql:8.0                       "docker-entrypoint.s…conds ago   Up 10 seconds            3306/tcp, 33060/tcp
+           elegant_pasteur
+094f359dfaac   cockroachdb/cockroach:v23.2.4   "/cockroach/cockroac…s ago       Up 9 minutes (healthy)   0.0.0.0:8080->8080/tcp, 0.0.0.06257/tcp   arc-id_cockroach
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\arc-id> docker ps
+CONTAINER ID   IMAGE                           COMMAND              ED         STATUS                    PORTS
+     NAMES
+414bc8281147   redis:7                         "docker-entrypoint.s…"   3 minutes ago   Up 2 minutes              6379/tcp
+                             gracious_wescoff
+094f359dfaac   cockroachdb/cockroach:v23.2.4   "/cockroach/cockroac…"   4 days ago      Up 13 minutes (healthy)   0.0.0.0:8080->8080/tcp, 0.0.0.0:26257->26257/tcp   arc-id_cockroach
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\arc-id> cd infra/docker
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\arc-id\infra\docker> docker ps
+CONTAINER ID   IMAGE                           COMMAND
+    CREATED         STATUS                    PORTS
+                             NAMES
+414bc8281147   redis:7                         "docker-entrypoint.s…"   7 minutes ago   Up 7 minutes              6379/tcp
+                             gracious_wescoff
+094f359dfaac   cockroachdb/cockroach:v23.2.4   "/cockroach/cockroac…"   4 days ago      Up 18 minutes (healthy)   0.0.0.0:8080->8080/tcp, 0.0.0.0:26257->26257/tcp   arc-id_cockroach
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\arc-id\infra\docker> docker compose up -d
+time="2025-10-13T15:52:08+01:00" level=warning msg="C:\\Users\\USER\\Desktop\\Projects\\ArcevoStack\\arc-id\\infra\\docker\\docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[+] Running 1/1
+ ✘ mongo Error Get "https://registry-1.docker.io/v2/": ...
+   41.1s
+Error response from daemon: Get "https://registry-1.docker.io/v2/": 
+net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+PS C:\Users\USER\Desktop\Projects\ArcevoStack\arc-id\infra\docker>  
 version: '3.8'
 
 services:

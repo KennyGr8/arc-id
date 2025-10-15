@@ -3,6 +3,7 @@
   "references": [
     { "path": "packages/common" },
     { "path": "packages/data" },
+    { "path": "packages/proto" },
     { "path": "packages/adapters" },
     { "path": "packages/runtime" },
     { "path": "packages/core" },

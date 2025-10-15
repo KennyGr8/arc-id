@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package arcid.cache;
+
+message CacheGetRequest {
+  string key = 1;
+}
+
+message CacheSetRequest {
+  string key = 1;
+  string value = 2;
+  int32 ttl = 3;
+}
+
+message CacheDelRequest {
+  string key = 1;
+}
+
+message CacheResponse {
+  bool success = 1;
+  string value = 2;
+  string message = 3;
+}
+
+service CacheAdapter {
+  rpc Get(CacheGetRequest) returns (CacheResponse);
+  rpc Set(CacheSetRequest) returns (CacheResponse);
+  rpc Del(CacheDelRequest) returns (CacheResponse);
+}

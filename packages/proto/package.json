@@ -3,17 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Protocol buffer definitions for ArcID runtime and adapters",
   "scripts": {
-    "gen:ts": "cross-env protoc --plugin=protoc-gen-ts=\"%CD%/node_modules/.bin/protoc-gen-ts.cmd\" --ts_out=../adapters/src/http/grpc/generated/ts --proto_path=../adapters/src/http/grpc/proto ../adapters/src/http/grpc/proto/http_adapter.proto",
+    "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo node_modules",
     
-    "gen:python": "cross-env \"%CD%/../../.venv/Scripts/python.exe\" -m grpc_tools.protoc -I=../adapters/src/http/grpc/proto --python_out=../adapters/src/http/grpc/generated/python --grpc_python_out=../adapters/src/http/grpc/generated/python ../adapters/src/http/grpc/proto/http_adapter.proto",
-    
-    "gen:php": "cross-env protoc --php_out=../adapters/src/http/grpc/generated/php --grpc_out=../adapters/src/http/grpc/generated/php --plugin=protoc-gen-grpc=\"/home/arcevodev/bin/grpc_php_plugin\" -I=../adapters/src/http/grpc/proto ../adapters/src/http/grpc/proto/http_adapter.proto",
-    
-    "gen:go": "cross-env protoc --go_out=../adapters/src/http/grpc/generated/go --go-grpc_out=../adapters/src/http/grpc/generated/go -I=../adapters/src/http/grpc/proto ../adapters/src/http/grpc/proto/http_adapter.proto",
-    
-    "gen:all": "pnpm gen:ts && pnpm gen:python && pnpm gen:php && pnpm gen:go"
+    "gen:http:ts": "cross-env protoc --plugin=protoc-gen-ts=\"%CD%/node_modules/.bin/protoc-gen-ts.cmd\" --ts_out=../adapters/src/http/grpc/generated/ts --proto_path=../adapters/src/http/grpc/proto ../adapters/src/http/grpc/proto/http_adapter.proto",
+    "gen:http:python": "cross-env python -m grpc_tools.protoc -I=../adapters/src/http/grpc/proto --python_out=../adapters/src/http/grpc/generated/python --grpc_python_out=../adapters/src/http/grpc/generated/python ../adapters/src/http/grpc/proto/http_adapter.proto",
+
+    "gen:mail:ts": "cross-env protoc --plugin=protoc-gen-ts=\"%CD%/node_modules/.bin/protoc-gen-ts.cmd\" --ts_out=../adapters/src/mail/grpc/generated/ts --proto_path=../adapters/src/mail/grpc/proto ../adapters/src/mail/grpc/proto/mail_adapter.proto",
+    "gen:mail:python": "cross-env python -m grpc_tools.protoc -I=../adapters/src/mail/grpc/proto --python_out=../adapters/src/mail/grpc/generated/python --grpc_python_out=../adapters/src/mail/grpc/generated/python ../adapters/src/mail/grpc/proto/mail_adapter.proto",
+
+    "gen:cache:ts": "cross-env protoc --plugin=protoc-gen-ts=\"%CD%/node_modules/.bin/protoc-gen-ts.cmd\" --ts_out=../adapters/src/cache/grpc/generated/ts --proto_path=../adapters/src/cache/grpc/proto ../adapters/src/cache/grpc/proto/cache_adapter.proto",
+    "gen:cache:python": "cross-env python -m grpc_tools.protoc -I=../adapters/src/cache/grpc/proto --python_out=../adapters/src/cache/grpc/generated/python --grpc_python_out=../adapters/src/cache/grpc/generated/python ../adapters/src/cache/grpc/proto/cache_adapter.proto",
+
+    "gen:billing:ts": "cross-env protoc --plugin=protoc-gen-ts=\"%CD%/node_modules/.bin/protoc-gen-ts.cmd\" --ts_out=../adapters/src/billing/grpc/generated/ts --proto_path=../adapters/src/billing/grpc/proto ../adapters/src/billing/grpc/proto/billing_adapter.proto",
+    "gen:billing:python": "cross-env python -m grpc_tools.protoc -I=../adapters/src/billing/grpc/proto --python_out=../adapters/src/billing/grpc/generated/python --grpc_python_out=../adapters/src/billing/grpc/generated/python ../adapters/src/billing/grpc/proto/billing_adapter.proto",
+
+    "gen:ts": "pnpm gen:http:ts && pnpm gen:mail:ts && pnpm gen:cache:ts && pnpm gen:billing:ts",
+    "gen:python": "pnpm gen:http:python && pnpm gen:mail:python && pnpm gen:cache:python && pnpm gen:billing:python",
+    "gen:all": "pnpm gen:ts && pnpm gen:python"
   },
   "devDependencies": {
     "@grpc/grpc-js": "^1.10.0",

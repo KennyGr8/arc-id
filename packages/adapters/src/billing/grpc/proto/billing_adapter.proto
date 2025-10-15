@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package arcid.billing;
+
+message PaymentRequest {
+  double amount = 1;
+  string currency = 2;
+  string customerEmail = 3;
+  map<string, string> metadata = 4;
+}
+
+message SubscriptionRequest {
+  string customerId = 1;
+  string planId = 2;
+  int32 trialPeriodDays = 3;
+  map<string, string> metadata = 4;
+}
+
+message InvoiceItem {
+  string description = 1;
+  double amount = 2;
+  int32 quantity = 3;
+}
+
+message InvoiceRequest {
+  string customerId = 1;
+  repeated InvoiceItem items = 2;
+  map<string, string> metadata = 3;
+}
+
+message CustomerRequest {
+  string email = 1;
+  string name = 2;
+  map<string, string> metadata = 3;
+}
+
+message WebhookRequest {
+  string payload = 1;
+  string signature = 2;
+}
+
+message StatusResponse {
+  bool success = 1;
+  string message = 2;
+  string data = 3;
+}
+
+service BillingAdapter {
+  rpc CreatePayment(PaymentRequest) returns (StatusResponse);
+  rpc CreateSubscription(SubscriptionRequest) returns (StatusResponse);
+  rpc CancelSubscription(SubscriptionRequest) returns (StatusResponse);
+  rpc CreateInvoice(InvoiceRequest) returns (StatusResponse);
+  rpc GetInvoice(InvoiceRequest) returns (StatusResponse);
+  rpc CreateCustomer(CustomerRequest) returns (StatusResponse);
+  rpc GetCustomer(CustomerRequest) returns (StatusResponse);
+  rpc HandleWebhook(WebhookRequest) returns (StatusResponse);
+}

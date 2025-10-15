@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package arcid.mail;
+
+message SendEmailRequest {
+  string to = 1;
+  string subject = 2;
+  string text = 3;
+  string html = 4;
+  string template = 5;
+  map<string, string> data = 6;
+  string from = 7;
+  repeated string cc = 8;
+  repeated string bcc = 9;
+}
+
+message StatusResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+service MailerAdapter {
+  rpc SendEmail(SendEmailRequest) returns (StatusResponse);
+}
