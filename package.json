@@ -17,12 +17,12 @@
     "typecheck": "tsc -b --noEmit"
   },
   "devDependencies": {
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.7.2",
     "rimraf": "^6.0.1",
-    "turbo": "^2.0.0",
-    "typescript": "^5.3.3"
+    "turbo": "^2.5.8",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@prisma/client": "^6.16.3"
+    "@prisma/client": "^6.17.1"
   }
 }
